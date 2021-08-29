@@ -127,8 +127,8 @@ int main(int argc, char** argv) {
 	if (argc < 3) usage(argv[0]);
 
 	if (setup() != 0) {
-		exit(1);
 		cleanup();
+		exit(1);
 	}
 
 	// cli arg handling
@@ -147,7 +147,6 @@ int main(int argc, char** argv) {
 			send_command(led_palm_brightness, hold);
 		} else {
 			usage(argv[0]);
-			exit(1);
 		}
 	} else if (strcmp(argv[1], "scroll") == 0) {
 		if (strcmp(argv[2], "off") == 0) {
@@ -164,7 +163,6 @@ int main(int argc, char** argv) {
 			send_command(led_scroll_brightness, hold);
 		} else {
 			usage(argv[0]);
-			exit(1);
 		}
 	} else if (strcmp(argv[1], "level") == 0) {
 		if (argc < 3) usage(argv[0]);
@@ -174,7 +172,6 @@ int main(int argc, char** argv) {
 		send_command(save, nothing);
 	} else {
 		usage(argv[0]);
-		exit(1);
 	}
 
 	cleanup();
