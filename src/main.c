@@ -32,7 +32,7 @@ const static uint16_t PACKET_CTRL_LEN = 8;
 static struct libusb_device_handle *devh = NULL;
 
 static void cleanup() {
-	libusb_release_interface(devh, 0);
+	if (devh != NULL) libusb_release_interface(devh, 0);
 	libusb_attach_kernel_driver(devh, 0);
 	libusb_close(devh);
 	libusb_exit(NULL);
@@ -107,11 +107,22 @@ int main(int argc, char** argv) {
 	const unsigned char led_scroll[] =            { 0xc4, 0x0f, 0x00, 0x15 };
 	const unsigned char led_scroll_brightness[] = { 0xc4, 0x0f, 0x00, 0x16 };
 
+	const unsigned char y_level[] = { 0xc4, 0x0f, 0x00, 0x04 };
+	const unsigned char x_level[] = { 0xc4, 0x0f, 0x00, 0x05 };
+
+	// not entirely sure what this is yet, but it makes it work
+	const unsigned char save[] = { 0xc4, 0x0f, 0x01, 0x00 };
+
+
 	// values
 	const unsigned char led_off[] =    { 0x00, 0x00, 0x00, 0x00 };
 	const unsigned char led_on[] =     { 0x01, 0x00, 0x00, 0x00 };
 	const unsigned char led_pulse[] =  { 0x02, 0x00, 0x00, 0x00 };
 	const unsigned char led_battle[] = { 0x03, 0x00, 0x00, 0x00 };
+	const unsigned char nothing[] = {0x00, 0x00, 0x00, 0x00};
+
+	// stores user input values
+	unsigned char hold[] = {0x00, 0x00, 0x00, 0x00};
 
 	if (argc < 3) usage(argv[0]);
 
@@ -132,9 +143,8 @@ int main(int argc, char** argv) {
 			send_command(led_palm, led_pulse);
 		} else if (strcmp(argv[2], "brightness") == 0) {
 			if (argc < 4) usage(argv[0]);
-			unsigned char brightness[] = {0x00, 0x00, 0x00, 0x00};
-			sscanf(argv[3], "%hhu", &brightness[0]);
-			send_command(led_palm_brightness, brightness);
+			sscanf(argv[3], "%hhu", &hold[0]);
+			send_command(led_palm_brightness, hold);
 		} else {
 			usage(argv[0]);
 			exit(1);
@@ -150,14 +160,18 @@ int main(int argc, char** argv) {
 			send_command(led_scroll, led_pulse);
 		} else if (strcmp(argv[2], "brightness") == 0) {
 			if (argc < 4) usage(argv[0]);
-			unsigned char brightness[] = {0x00, 0x00, 0x00, 0x00};
-			sscanf(argv[3], "%hhu", &brightness[0]);
-			send_command(led_scroll_brightness, brightness);
-
+			sscanf(argv[3], "%hhu", &hold[0]);
+			send_command(led_scroll_brightness, hold);
 		} else {
 			usage(argv[0]);
 			exit(1);
 		}
+	} else if (strcmp(argv[1], "level") == 0) {
+		if (argc < 3) usage(argv[0]);
+		sscanf(argv[2], "%hhu", &hold[0]);
+		send_command(x_level, hold);
+		send_command(y_level, hold);
+		send_command(save, nothing);
 	} else {
 		usage(argv[0]);
 		exit(1);

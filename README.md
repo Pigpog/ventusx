@@ -5,9 +5,11 @@ the TteSPORTS Ventus X mouse on Linux.
 
 ## Usage
 
-Currently, this utility can only control the LEDs, with independent
-control of the palm and scroll wheel. Both can be set to on, off,
-pulse, or "battle" mode, and their brightness can be adjusted.
+Current features:
+
+ - full control of LEDs, including features not found in the official
+   utility such as brightness
+ - DPI level
 
 ```
 # control the palm LED
@@ -31,6 +33,8 @@ ventusx palm brightness 255
 ventusx scroll brightness 0
 ventusx scroll brightness 255
 
+# set DPI level, between 0 and 63
+ventusx level 12
 ```
 
 ## Compiling
