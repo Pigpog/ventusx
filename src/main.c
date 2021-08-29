@@ -78,7 +78,7 @@ static int setup() {
 }
 
 void usage(char* basename) {
-	printf("usage: %s {rear | scroll} {on | off}\n", basename);
+	printf("usage: %s {palm | scroll} {on | off}\n", basename);
 }
 
 int main(int argc, char** argv) {
@@ -90,10 +90,10 @@ int main(int argc, char** argv) {
 	 */
 	
 	unsigned char *data;
-	unsigned char rear_off[] =   { 0xc4, 0x0f, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	unsigned char rear_on[] =    { 0xc4, 0x0f, 0x00, 0x13, 0x02, 0x00, 0x00, 0x00, 0x00 };
-	unsigned char scroll_off[] = { 0xc4, 0x0f, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	unsigned char scroll_on[] =  { 0xc4, 0x0f, 0x00, 0x15, 0x01, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char led_palm_off[] =   { 0xc4, 0x0f, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char led_palm_on[] =    { 0xc4, 0x0f, 0x00, 0x13, 0x02, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char led_scroll_off[] = { 0xc4, 0x0f, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char led_scroll_on[] =  { 0xc4, 0x0f, 0x00, 0x15, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
 	if (argc < 3) {
 		usage(argv[0]);
@@ -101,20 +101,20 @@ int main(int argc, char** argv) {
 	}
 
 	// cli arg handling
-	if (strcmp(argv[1], "rear") == 0) {
+	if (strcmp(argv[1], "palm") == 0) {
 		if (strcmp(argv[2] , "off") == 0) {
-			data = rear_off;
+			data = led_palm_off;
 		} else if (strcmp(argv[2], "on") == 0) {
-			data = rear_on;
+			data = led_palm_on;
 		} else {
 			usage(argv[0]);
 			exit(1);
 		}
 	} else if (strcmp(argv[1], "scroll") == 0) {
 		if (strcmp(argv[2], "off") == 0) {
-			data = scroll_off;
+			data = led_scroll_off;
 		} else if (strcmp(argv[2], "on") == 0) {
-			data = scroll_on;
+			data = led_scroll_on;
 		} else {
 			usage(argv[0]);
 			exit(1);

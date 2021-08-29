@@ -9,8 +9,8 @@ Currently, this utility is only able to toggle the LEDs on the mouse.
 
 ```
 # toggle the palm LED
-ventusx rear off
-ventusx rear on
+ventusx palm off
+ventusx palm on
 
 # toggle the scroll wheel LED
 ventusx scroll off
