@@ -77,8 +77,18 @@ static int setup() {
 	return 0;
 }
 
-void usage(char* basename) {
+static void usage(char* basename) {
 	printf("usage: %s {palm | scroll} {on | off}\n", basename);
+}
+
+static void send_command(unsigned char *data) {
+	// send the command to the mouse
+	int state = libusb_control_transfer(devh, 0x21, HID_SET_REPORT, 0x0300, 0, data, PACKET_CTRL_LEN, 5000);
+	if (state < 0) {
+		fprintf(stderr, "control out error %d\n", state);
+		cleanup();
+		exit(1);
+	}
 }
 
 int main(int argc, char** argv) {
@@ -89,37 +99,17 @@ int main(int argc, char** argv) {
 	 * scroll light on  = data c40f001501000000 length 8 wIndex 0 wValue 0x0300 bRequest 9 bRequest 0x09 bmRequestType 0x21
 	 */
 	
-	unsigned char *data;
-	unsigned char led_palm_off[] =   { 0xc4, 0x0f, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	unsigned char led_palm_on[] =    { 0xc4, 0x0f, 0x00, 0x13, 0x02, 0x00, 0x00, 0x00, 0x00 };
-	unsigned char led_scroll_off[] = { 0xc4, 0x0f, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	unsigned char led_scroll_on[] =  { 0xc4, 0x0f, 0x00, 0x15, 0x01, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char led_palm_off[] =   { 0xc4, 0x0f, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char led_palm_on[] =    { 0xc4, 0x0f, 0x00, 0x13, 0x02, 0x00, 0x00, 0x00 };
+	unsigned char led_scroll_off[] = { 0xc4, 0x0f, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char led_scroll_on[] =  { 0xc4, 0x0f, 0x00, 0x15, 0x01, 0x00, 0x00, 0x00 };
+
+	unsigned char battle_mode_on_1[] =  { 0xc4, 0x0f, 0x00, 0x13, 0x03, 0x00, 0x00, 0x00 };
+	unsigned char battle_mode_on_2[] =  { 0xc4, 0x0f, 0x00, 0x15, 0x03, 0x00, 0x00, 0x00 };
+	unsigned char battle_mode_off_1[] = { 0xc4, 0x0f, 0x00, 0x13, 0x02, 0x00, 0x00, 0x00 };
+	unsigned char battle_mode_off_2[] = { 0xc4, 0x0f, 0x00, 0x15, 0x01, 0x00, 0x00, 0x00 };
 
 	if (argc < 3) {
-		usage(argv[0]);
-		exit(1);
-	}
-
-	// cli arg handling
-	if (strcmp(argv[1], "palm") == 0) {
-		if (strcmp(argv[2] , "off") == 0) {
-			data = led_palm_off;
-		} else if (strcmp(argv[2], "on") == 0) {
-			data = led_palm_on;
-		} else {
-			usage(argv[0]);
-			exit(1);
-		}
-	} else if (strcmp(argv[1], "scroll") == 0) {
-		if (strcmp(argv[2], "off") == 0) {
-			data = led_scroll_off;
-		} else if (strcmp(argv[2], "on") == 0) {
-			data = led_scroll_on;
-		} else {
-			usage(argv[0]);
-			exit(1);
-		}
-	} else {
 		usage(argv[0]);
 		exit(1);
 	}
@@ -129,13 +119,41 @@ int main(int argc, char** argv) {
 		cleanup();
 	}
 
-	// send the command to the mouse
-	int state = libusb_control_transfer(devh, 0x21, HID_SET_REPORT, 0x0300, 0, data, PACKET_CTRL_LEN, 5000);
-	if (state < 0) {
-		fprintf(stderr, "control out error %d\n", state);
-		cleanup();
+	// cli arg handling
+	if (strcmp(argv[1], "palm") == 0) {
+		if (strcmp(argv[2] , "off") == 0) {
+			send_command(led_palm_off);
+		} else if (strcmp(argv[2], "on") == 0) {
+			send_command(led_palm_on);
+		} else {
+			usage(argv[0]);
+			exit(1);
+		}
+	} else if (strcmp(argv[1], "scroll") == 0) {
+		if (strcmp(argv[2], "off") == 0) {
+			send_command(led_scroll_off);
+		} else if (strcmp(argv[2], "on") == 0) {
+			send_command(led_scroll_on);
+		} else {
+			usage(argv[0]);
+			exit(1);
+		}
+	} else if (strcmp(argv[1], "battle") == 0) {
+		if (strcmp(argv[2], "off") == 0) {
+			send_command(battle_mode_off_1);
+			send_command(battle_mode_off_2);
+		} else if (strcmp(argv[2], "on") == 0) {
+			send_command(battle_mode_on_1);
+			send_command(battle_mode_on_2);
+		} else {
+			usage(argv[0]);
+			exit(1);
+		}
+	} else {
+		usage(argv[0]);
 		exit(1);
 	}
+
 
 	cleanup();
 	return 0;
