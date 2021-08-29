@@ -78,7 +78,9 @@ static int setup() {
 }
 
 static void usage(char* basename) {
-	printf("usage: %s {palm | scroll} {on | off | battle | pulse}\n", basename);
+	printf("usage: %s {palm | scroll} {on | off | battle | pulse | {brightness VALUE}}\n", basename);
+	cleanup();
+	exit(1);
 }
 
 static void send_command(const unsigned char *address, const unsigned char *value) {
@@ -111,10 +113,7 @@ int main(int argc, char** argv) {
 	const unsigned char led_pulse[] =  { 0x02, 0x00, 0x00, 0x00 };
 	const unsigned char led_battle[] = { 0x03, 0x00, 0x00, 0x00 };
 
-	if (argc < 3) {
-		usage(argv[0]);
-		exit(1);
-	}
+	if (argc < 3) usage(argv[0]);
 
 	if (setup() != 0) {
 		exit(1);
@@ -131,6 +130,11 @@ int main(int argc, char** argv) {
 			send_command(led_palm, led_battle);
 		} else if (strcmp(argv[2], "pulse") == 0) {
 			send_command(led_palm, led_pulse);
+		} else if (strcmp(argv[2], "brightness") == 0) {
+			if (argc < 4) usage(argv[0]);
+			unsigned char brightness[] = {0x00, 0x00, 0x00, 0x00};
+			sscanf(argv[3], "%hhu", &brightness[0]);
+			send_command(led_palm_brightness, brightness);
 		} else {
 			usage(argv[0]);
 			exit(1);
@@ -144,6 +148,12 @@ int main(int argc, char** argv) {
 			send_command(led_scroll, led_battle);
 		} else if (strcmp(argv[2], "pulse") == 0) {
 			send_command(led_scroll, led_pulse);
+		} else if (strcmp(argv[2], "brightness") == 0) {
+			if (argc < 4) usage(argv[0]);
+			unsigned char brightness[] = {0x00, 0x00, 0x00, 0x00};
+			sscanf(argv[3], "%hhu", &brightness[0]);
+			send_command(led_scroll_brightness, brightness);
+
 		} else {
 			usage(argv[0]);
 			exit(1);
