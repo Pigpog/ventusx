@@ -78,7 +78,7 @@ static int setup() {
 }
 
 static void usage(char* basename) {
-	printf("usage: %s {palm | scroll} {on | off | battle}\n", basename);
+	printf("usage: %s {palm | scroll} {on | off | battle | pulse}\n", basename);
 }
 
 static void send_command(unsigned char *data) {
@@ -92,11 +92,14 @@ static void send_command(unsigned char *data) {
 }
 
 int main(int argc, char** argv) {
-	unsigned char led_palm_off[] =   { 0xc4, 0x0f, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00 };
-	unsigned char led_palm_on[] =    { 0xc4, 0x0f, 0x00, 0x13, 0x02, 0x00, 0x00, 0x00 };
+	unsigned char led_palm_off[] =      { 0xc4, 0x0f, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char led_palm_on[] =       { 0xc4, 0x0f, 0x00, 0x13, 0x01, 0x00, 0x00, 0x00 };
+	unsigned char led_palm_pulse[] =    { 0xc4, 0x0f, 0x00, 0x13, 0x02, 0x00, 0x00, 0x00 };
 	unsigned char led_palm_battle[] =   { 0xc4, 0x0f, 0x00, 0x13, 0x03, 0x00, 0x00, 0x00 };
-	unsigned char led_scroll_off[] = { 0xc4, 0x0f, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00 };
-	unsigned char led_scroll_on[] =  { 0xc4, 0x0f, 0x00, 0x15, 0x01, 0x00, 0x00, 0x00 };
+
+	unsigned char led_scroll_off[] =    { 0xc4, 0x0f, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char led_scroll_on[] =     { 0xc4, 0x0f, 0x00, 0x15, 0x01, 0x00, 0x00, 0x00 };
+	unsigned char led_scroll_pulse[] =  { 0xc4, 0x0f, 0x00, 0x15, 0x02, 0x00, 0x00, 0x00 };
 	unsigned char led_scroll_battle[] = { 0xc4, 0x0f, 0x00, 0x15, 0x03, 0x00, 0x00, 0x00 };
 
 	if (argc < 3) {
@@ -117,6 +120,8 @@ int main(int argc, char** argv) {
 			send_command(led_palm_on);
 		} else if (strcmp(argv[2], "battle") == 0) {
 			send_command(led_palm_battle);
+		} else if (strcmp(argv[2], "pulse") == 0) {
+			send_command(led_palm_pulse);
 		} else {
 			usage(argv[0]);
 			exit(1);
@@ -128,6 +133,8 @@ int main(int argc, char** argv) {
 			send_command(led_scroll_on);
 		} else if (strcmp(argv[2], "battle") == 0) {
 			send_command(led_scroll_battle);
+		} else if (strcmp(argv[2], "pulse") == 0) {
+			send_command(led_scroll_pulse);
 		} else {
 			usage(argv[0]);
 			exit(1);
