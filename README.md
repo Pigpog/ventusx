@@ -8,7 +8,7 @@ the TteSPORTS Ventus X mouse on Linux.
 Currently, this utility can:
 
  - toggle the LEDs on the mouse
- - toggle "battle" mode
+ - enable "battle" mode
 
 ```
 # toggle the palm LED
@@ -19,9 +19,9 @@ ventusx palm on
 ventusx scroll off
 ventusx scroll on
 
-# toggle "battle" mode
-ventusx battle off
-ventusx battle on
+# use "battle" mode
+ventusx palm battle
+ventusx scroll battle
 ```
 
 ## Compiling
