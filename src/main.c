@@ -32,8 +32,10 @@ const static uint16_t PACKET_CTRL_LEN = 8;
 static struct libusb_device_handle *devh = NULL;
 
 static void cleanup() {
-	if (devh != NULL) libusb_release_interface(devh, 0);
-	libusb_attach_kernel_driver(devh, 0);
+	if (devh != NULL) {
+		libusb_release_interface(devh, 0);
+		libusb_attach_kernel_driver(devh, 0);
+	}
 	libusb_close(devh);
 	libusb_exit(NULL);
 }
