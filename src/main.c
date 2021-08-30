@@ -78,7 +78,7 @@ static int setup() {
 }
 
 static void usage(char* basename) {
-	printf("usage: %s {palm | scroll} {on | off | battle | pulse | {brightness VALUE}}\n", basename);
+	printf("usage: %s [{palm|scroll} {on|off|battle|pulse|{brightness VALUE}}]\n", basename);
 	cleanup();
 	exit(1);
 }
@@ -107,8 +107,8 @@ int main(int argc, char** argv) {
 	const unsigned char led_scroll[] =            { 0xc4, 0x0f, 0x00, 0x15 };
 	const unsigned char led_scroll_brightness[] = { 0xc4, 0x0f, 0x00, 0x16 };
 
-	const unsigned char y_level[] = { 0xc4, 0x0f, 0x00, 0x04 };
-	const unsigned char x_level[] = { 0xc4, 0x0f, 0x00, 0x05 };
+	const unsigned char x_dpi[] = { 0xc4, 0x0f, 0x00, 0x04 };
+	const unsigned char y_dpi[] = { 0xc4, 0x0f, 0x00, 0x05 };
 
 	// not entirely sure what this is yet, but it makes it work
 	const unsigned char save[] = { 0xc4, 0x0f, 0x01, 0x00 };
@@ -119,10 +119,10 @@ int main(int argc, char** argv) {
 	const unsigned char led_on[] =     { 0x01, 0x00, 0x00, 0x00 };
 	const unsigned char led_pulse[] =  { 0x02, 0x00, 0x00, 0x00 };
 	const unsigned char led_battle[] = { 0x03, 0x00, 0x00, 0x00 };
-	const unsigned char nothing[] = {0x00, 0x00, 0x00, 0x00};
+	const unsigned char nothing[] =    { 0x00, 0x00, 0x00, 0x00 };
 
 	// stores user input values
-	unsigned char hold[] = {0x00, 0x00, 0x00, 0x00};
+	unsigned char hold[] = { 0x00, 0x00, 0x00, 0x00 };
 
 	if (argc < 3) usage(argv[0]);
 
@@ -164,11 +164,11 @@ int main(int argc, char** argv) {
 		} else {
 			usage(argv[0]);
 		}
-	} else if (strcmp(argv[1], "level") == 0) {
+	} else if (strcmp(argv[1], "dpi") == 0) {
 		if (argc < 3) usage(argv[0]);
 		sscanf(argv[2], "%hhu", &hold[0]);
-		send_command(x_level, hold);
-		send_command(y_level, hold);
+		send_command(x_dpi, hold);
+		send_command(y_dpi, hold);
 		send_command(save, nothing);
 	} else {
 		usage(argv[0]);

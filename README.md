@@ -34,7 +34,7 @@ ventusx scroll brightness 0
 ventusx scroll brightness 255
 
 # set DPI level, between 0 and 63
-ventusx level 12
+ventusx dpi 12
 ```
 
 ## Compiling
