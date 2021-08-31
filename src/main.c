@@ -120,8 +120,8 @@ int main(int argc, char** argv) {
 
 	// -- addresses --
 	// led control addresses
-	const unsigned char led_palm =              0x13;
-	const unsigned char led_scroll =            0x15;
+	const unsigned char led_palm =   0x13;
+	const unsigned char led_scroll = 0x15;
 
 	// performance control addresses
 	const unsigned char x_dpi = 0x04;
@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
 	const unsigned char led_battle = 0x03;
 
 	// stores user input values
-	unsigned char hold = 0x00;
+	unsigned char value = 0x00;
 
 	if (argc < 3) usage();
 
@@ -154,29 +154,29 @@ int main(int argc, char** argv) {
 		if (strcmp(argv[1], "palm") == 0) addr = led_palm;
 		if (strcmp(argv[1], "scroll") == 0) addr = led_scroll;
 		if (strcmp(argv[2] , "off") == 0) {
-			hold = led_off;
+			value = led_off;
 		} else if (strcmp(argv[2], "on") == 0) {
-			hold = led_on;
+			value = led_on;
 		} else if (strcmp(argv[2], "battle") == 0) {
-			hold = led_battle;
+			value = led_battle;
 		} else if (strcmp(argv[2], "pulse") == 0) {
-			hold = led_pulse;
+			value = led_pulse;
 		} else if (strcmp(argv[2], "brightness") == 0) {
 			if (argc < 4) usage();
 			// brightness addr = led addr + 1
 			addr++;
-			sscanf(argv[3], "%hhu", &hold);
+			sscanf(argv[3], "%hhu", &value);
 		} else {
 			usage();
 		}
-		send_command(addr, hold);
+		send_command(addr, value);
 	} else if (strcmp(argv[1], "dpi") == 0) {
-		sscanf(argv[2], "%hhu", &hold);
-		send_command(x_dpi, hold);
-		send_command(y_dpi, hold);
+		sscanf(argv[2], "%hhu", &value);
+		send_command(x_dpi, value);
+		send_command(y_dpi, value);
 	} else if (strcmp(argv[1], "polling") == 0) {
-		sscanf(argv[2], "%hhu", &hold);
-		send_command(polling_rate, hold);
+		sscanf(argv[2], "%hhu", &value);
+		send_command(polling_rate, value);
 	} else {
 		usage();
 	}
