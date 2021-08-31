@@ -83,7 +83,9 @@ static int setup() {
 }
 
 static void usage(char* basename) {
-	printf("usage:\n    control an led: %s {palm|scroll} {on|off|battle|pulse|{brightness VALUE}}\n    set dpi: %s dpi VALUE\n", basename, basename);
+	printf("usage:\n");
+	printf("    control an led: %s {palm|scroll} {on|off|battle|pulse|{brightness VALUE}}\n", basename);
+	printf("    set dpi: %s dpi VALUE\n", basename);
 	cleanup();
 	exit(1);
 }
