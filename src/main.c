@@ -179,12 +179,10 @@ int main(int argc, char** argv) {
 			usage(argv[0]);
 		}
 	} else if (strcmp(argv[1], "dpi") == 0) {
-		if (argc < 3) usage(argv[0]);
 		sscanf(argv[2], "%hhu", &hold);
 		send_command(x_dpi, hold);
 		send_command(y_dpi, hold);
 	} else if (strcmp(argv[1], "polling") == 0) {
-		if (argc < 3) usage(argv[0]);
 		sscanf(argv[2], "%hhu", &hold);
 		send_command(polling_rate, hold);
 	} else {
