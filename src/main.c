@@ -29,6 +29,9 @@ const static uint16_t VENDOR_ID = 0x264a;
 const static uint16_t PRODUCT_ID = 0x1007;
 const static uint16_t PACKET_CTRL_LEN = 8;
 
+// not entirely sure what this is yet, but it makes it work
+unsigned char save[] = { 0xc4, 0x0f, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00};
+
 static struct libusb_device_handle *devh = NULL;
 
 static void cleanup() {
@@ -85,16 +88,22 @@ static void usage(char* basename) {
 	exit(1);
 }
 
-static void send_command(const unsigned char *address, const unsigned char *value) {
-	unsigned char data[PACKET_CTRL_LEN];
+static void send_command(const unsigned char address, const unsigned char value) {
+	int state;
+	unsigned char data[] = { 0xc4, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	// combine address and value
-	for (int i = 0; i < 4; i++){
-		data[i] = address[i];
-		data[i + 4] = value[i];
-	}
+	data[3] = address;
+	data[4] = value;
 
 	// send the command to the mouse
-	int state = libusb_control_transfer(devh, 0x21, HID_SET_REPORT, 0x0300, 0, data, PACKET_CTRL_LEN, 5000);
+	state = libusb_control_transfer(devh, 0x21, HID_SET_REPORT, 0x0300, 0, data, PACKET_CTRL_LEN, 5000);
+	if (state < 0) {
+		fprintf(stderr, "control out error %d\n", state);
+		cleanup();
+		exit(1);
+	}
+
+	state = libusb_control_transfer(devh, 0x21, HID_SET_REPORT, 0x0300, 0, save, PACKET_CTRL_LEN, 5000);
 	if (state < 0) {
 		fprintf(stderr, "control out error %d\n", state);
 		cleanup();
@@ -105,31 +114,27 @@ static void send_command(const unsigned char *address, const unsigned char *valu
 int main(int argc, char** argv) {
 	// -- addresses --
 	// led control addresses
-	const unsigned char led_palm[] =              { 0xc4, 0x0f, 0x00, 0x13 };
-	const unsigned char led_palm_brightness[] =   { 0xc4, 0x0f, 0x00, 0x14 };
-	const unsigned char led_scroll[] =            { 0xc4, 0x0f, 0x00, 0x15 };
-	const unsigned char led_scroll_brightness[] = { 0xc4, 0x0f, 0x00, 0x16 };
+	const unsigned char led_palm =              0x13;
+	const unsigned char led_palm_brightness =   0x14;
+	const unsigned char led_scroll =            0x15;
+	const unsigned char led_scroll_brightness = 0x16;
 
 	// performance control addresses
-	const unsigned char x_dpi[] = { 0xc4, 0x0f, 0x00, 0x04 };
-	const unsigned char y_dpi[] = { 0xc4, 0x0f, 0x00, 0x05 };
+	const unsigned char x_dpi = 0x04;
+	const unsigned char y_dpi = 0x05;
 
 	// values: 0x01 = 1000Hz, 0x02 = 500Hz, 0x04 = 250Hz,  0x08 = 125Hz
-	const unsigned char polling_rate[] = { 0xc4, 0x0f, 0x00, 0x00 }; 
-
-	// not entirely sure what this is yet, but it makes it work
-	const unsigned char save[] = { 0xc4, 0x0f, 0x01, 0x00 };
+	const unsigned char polling_rate = 0x00; 
 
 
 	// -- values --
-	const unsigned char led_off[] =    { 0x00, 0x00, 0x00, 0x00 };
-	const unsigned char led_on[] =     { 0x01, 0x00, 0x00, 0x00 };
-	const unsigned char led_pulse[] =  { 0x02, 0x00, 0x00, 0x00 };
-	const unsigned char led_battle[] = { 0x03, 0x00, 0x00, 0x00 };
-	const unsigned char nothing[] =    { 0x00, 0x00, 0x00, 0x00 };
+	const unsigned char led_off =    0x00;
+	const unsigned char led_on =     0x01;
+	const unsigned char led_pulse =  0x02;
+	const unsigned char led_battle = 0x03;
 
 	// stores user input values
-	unsigned char hold[] = { 0x00, 0x00, 0x00, 0x00 };
+	unsigned char hold = 0x00;
 
 	if (argc < 3) usage(argv[0]);
 
@@ -150,7 +155,7 @@ int main(int argc, char** argv) {
 			send_command(led_palm, led_pulse);
 		} else if (strcmp(argv[2], "brightness") == 0) {
 			if (argc < 4) usage(argv[0]);
-			sscanf(argv[3], "%hhu", &hold[0]);
+			sscanf(argv[3], "%hhu", &hold);
 			send_command(led_palm_brightness, hold);
 		} else {
 			usage(argv[0]);
@@ -166,22 +171,20 @@ int main(int argc, char** argv) {
 			send_command(led_scroll, led_pulse);
 		} else if (strcmp(argv[2], "brightness") == 0) {
 			if (argc < 4) usage(argv[0]);
-			sscanf(argv[3], "%hhu", &hold[0]);
+			sscanf(argv[3], "%hhu", &hold);
 			send_command(led_scroll_brightness, hold);
 		} else {
 			usage(argv[0]);
 		}
 	} else if (strcmp(argv[1], "dpi") == 0) {
 		if (argc < 3) usage(argv[0]);
-		sscanf(argv[2], "%hhu", &hold[0]);
+		sscanf(argv[2], "%hhu", &hold);
 		send_command(x_dpi, hold);
 		send_command(y_dpi, hold);
-		send_command(save, nothing);
 	} else if (strcmp(argv[1], "polling") == 0) {
 		if (argc < 3) usage(argv[0]);
-		sscanf(argv[2], "%hhu", &hold[0]);
+		sscanf(argv[2], "%hhu", &hold);
 		send_command(polling_rate, hold);
-		send_command(save, nothing);
 	} else {
 		usage(argv[0]);
 	}
