@@ -41,6 +41,11 @@ ventusx dpi 12
 ventusx polling 1
 # set polling rate to 125:
 ventusx polling 8
+
+# bind the "dpi" button to "a":
+ventusx bind dpi kbd 4
+# bind left click to right click:
+ventusx bind left mouse 2
 ```
 
 ## Compiling

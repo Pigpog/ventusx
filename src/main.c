@@ -88,6 +88,8 @@ static void usage() {
 	printf("usage:\n");
 	printf("    control an led: %s {palm|scroll} {on|off|battle|pulse|{brightness VALUE}}\n", basename);
 	printf("    set dpi: %s dpi VALUE\n", basename);
+	printf("    set polling rate: %s polling VALUE\n", basename);
+	printf("    rebind a buttion: %s bind BTTN {kbd|mouse} VALUE\n", basename);
 	cleanup();
 	exit(1);
 }
@@ -130,6 +132,22 @@ int main(int argc, char** argv) {
 	// values: 0x01 = 1000Hz, 0x02 = 500Hz, 0x04 = 250Hz,  0x08 = 125Hz
 	const unsigned char polling_rate = 0x00; 
 
+	// bind control addresses
+	// these addresses set whether the bind is
+	// a mouse or kbd function.
+	// sending 0x01 sets it to mouse
+	// sending 0x02 sets it to kbd
+	// addr + 1 = the mouse mode bind
+	// addr + 2 = the kbd mode bind
+	const unsigned char bind_macro_btn =  0x30;
+	const unsigned char bind_left_btn =   0x17;
+	const unsigned char bind_right_btn =  0x1c;
+	const unsigned char bind_scroll_btn = 0x21;
+	const unsigned char bind_scroll_up =  0x35;
+	const unsigned char bind_scroll_dwn = 0x3a;
+	const unsigned char bind_back_btn =   0x26;
+	const unsigned char bind_fwd_btn =    0x2b;
+
 	// the address the user chose
 	unsigned char addr;
 
@@ -152,23 +170,19 @@ int main(int argc, char** argv) {
 	// cli arg handling
 	if (strcmp(argv[1], "palm") == 0 || strcmp(argv[1], "scroll") == 0) {
 		if (strcmp(argv[1], "palm") == 0) addr = led_palm;
-		if (strcmp(argv[1], "scroll") == 0) addr = led_scroll;
-		if (strcmp(argv[2] , "off") == 0) {
-			value = led_off;
-		} else if (strcmp(argv[2], "on") == 0) {
-			value = led_on;
-		} else if (strcmp(argv[2], "battle") == 0) {
-			value = led_battle;
-		} else if (strcmp(argv[2], "pulse") == 0) {
-			value = led_pulse;
-		} else if (strcmp(argv[2], "brightness") == 0) {
+		else if (strcmp(argv[1], "scroll") == 0) addr = led_scroll;
+
+		if (strcmp(argv[2], "off") == 0)		value = led_off;
+		else if (strcmp(argv[2], "on") == 0)		value = led_on;
+		else if (strcmp(argv[2], "battle") == 0)	value = led_battle;
+		else if (strcmp(argv[2], "pulse") == 0)		value = led_pulse;
+		else if (strcmp(argv[2], "brightness") == 0) {
 			if (argc < 4) usage();
 			// brightness addr = led addr + 1
 			addr++;
 			sscanf(argv[3], "%hhu", &value);
-		} else {
-			usage();
-		}
+		} else usage();
+
 		send_command(addr, value);
 	} else if (strcmp(argv[1], "dpi") == 0) {
 		sscanf(argv[2], "%hhu", &value);
@@ -177,6 +191,37 @@ int main(int argc, char** argv) {
 	} else if (strcmp(argv[1], "polling") == 0) {
 		sscanf(argv[2], "%hhu", &value);
 		send_command(polling_rate, value);
+	} else if (strcmp(argv[1], "bind") == 0) {
+		if (argc < 5) usage();
+
+		if (strcmp(argv[2], "left") == 0)		addr = bind_left_btn;
+		else if (strcmp(argv[2], "right") == 0)		addr = bind_right_btn;
+		else if (strcmp(argv[2], "scroll") == 0)	addr = bind_scroll_btn;
+		else if (strcmp(argv[2], "dpi") == 0)		addr = bind_macro_btn;
+		else if (strcmp(argv[2], "scroll_up") == 0)	addr = bind_scroll_up;
+		else if (strcmp(argv[2], "scroll_down") == 0)	addr = bind_scroll_dwn;
+		else if (strcmp(argv[2], "forward") == 0)	addr = bind_fwd_btn;
+		else if (strcmp(argv[2], "back") == 0)		addr = bind_back_btn;
+		else usage();
+
+		if (strcmp(argv[3], "mouse") == 0) {
+			// set the button to perform mouse functions
+			send_command(addr, 0x01);
+			// clear kbd bind
+			send_command(addr + 2, 0x00);
+
+			addr++;
+		} else if (strcmp(argv[3], "kbd") == 0) {
+			// set the button to perform kbd functions
+			send_command(addr, 0x02);
+			// clear mouse bind
+			send_command(addr + 1, 0x00);
+
+			addr += 2;
+		} else usage();
+
+		sscanf(argv[4], "%hhu", &value);
+		send_command(addr, value);
 	} else {
 		usage();
 	}
