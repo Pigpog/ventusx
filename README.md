@@ -10,6 +10,7 @@ Current features:
  - full control of LEDs, including features not found in the official
    utility such as brightness
  - DPI level
+ - Polling rate
 
 ```
 # control the palm LED
@@ -35,6 +36,11 @@ ventusx scroll brightness 255
 
 # set DPI level, between 0 and 63
 ventusx dpi 12
+
+# set polling rate to 1000:
+ventusx polling 1
+# set polling rate to 125:
+ventusx polling 8
 ```
 
 ## Compiling

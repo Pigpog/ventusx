@@ -103,20 +103,25 @@ static void send_command(const unsigned char *address, const unsigned char *valu
 }
 
 int main(int argc, char** argv) {
-	// addresses
+	// -- addresses --
+	// led control addresses
 	const unsigned char led_palm[] =              { 0xc4, 0x0f, 0x00, 0x13 };
 	const unsigned char led_palm_brightness[] =   { 0xc4, 0x0f, 0x00, 0x14 };
 	const unsigned char led_scroll[] =            { 0xc4, 0x0f, 0x00, 0x15 };
 	const unsigned char led_scroll_brightness[] = { 0xc4, 0x0f, 0x00, 0x16 };
 
+	// performance control addresses
 	const unsigned char x_dpi[] = { 0xc4, 0x0f, 0x00, 0x04 };
 	const unsigned char y_dpi[] = { 0xc4, 0x0f, 0x00, 0x05 };
+
+	// values: 0x01 = 1000Hz, 0x02 = 500Hz, 0x04 = 250Hz,  0x08 = 125Hz
+	const unsigned char polling_rate[] = { 0xc4, 0x0f, 0x00, 0x00 }; 
 
 	// not entirely sure what this is yet, but it makes it work
 	const unsigned char save[] = { 0xc4, 0x0f, 0x01, 0x00 };
 
 
-	// values
+	// -- values --
 	const unsigned char led_off[] =    { 0x00, 0x00, 0x00, 0x00 };
 	const unsigned char led_on[] =     { 0x01, 0x00, 0x00, 0x00 };
 	const unsigned char led_pulse[] =  { 0x02, 0x00, 0x00, 0x00 };
@@ -171,6 +176,11 @@ int main(int argc, char** argv) {
 		sscanf(argv[2], "%hhu", &hold[0]);
 		send_command(x_dpi, hold);
 		send_command(y_dpi, hold);
+		send_command(save, nothing);
+	} else if (strcmp(argv[1], "polling") == 0) {
+		if (argc < 3) usage(argv[0]);
+		sscanf(argv[2], "%hhu", &hold[0]);
+		send_command(polling_rate, hold);
 		send_command(save, nothing);
 	} else {
 		usage(argv[0]);
