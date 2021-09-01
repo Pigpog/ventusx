@@ -11,6 +11,7 @@ Current features:
    utility such as brightness
  - DPI level
  - Polling rate
+ - Rebinding buttons
 
 ```
 # control the palm LED
@@ -43,9 +44,9 @@ ventusx polling 1
 ventusx polling 8
 
 # bind the "dpi" button to "a":
-ventusx bind dpi kbd 4
+ventusx bind dpi kbd a
 # bind left click to right click:
-ventusx bind left mouse 2
+ventusx bind left mouse right
 ```
 
 ## Compiling

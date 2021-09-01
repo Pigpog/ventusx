@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <libusb-1.0/libusb.h>
+#include "data.c"
 
 #define HID_GET_REPORT                0x01
 #define HID_SET_REPORT                0x09
@@ -120,43 +121,8 @@ static void send_command(const unsigned char address, const unsigned char value)
 int main(int argc, char** argv) {
 	basename = argv[0];
 
-	// -- addresses --
-	// led control addresses
-	const unsigned char led_palm =   0x13;
-	const unsigned char led_scroll = 0x15;
-
-	// performance control addresses
-	const unsigned char x_dpi = 0x04;
-	const unsigned char y_dpi = 0x05;
-
-	// values: 0x01 = 1000Hz, 0x02 = 500Hz, 0x04 = 250Hz,  0x08 = 125Hz
-	const unsigned char polling_rate = 0x00; 
-
-	// bind control addresses
-	// these addresses set whether the bind is
-	// a mouse or kbd function.
-	// sending 0x01 sets it to mouse
-	// sending 0x02 sets it to kbd
-	// addr + 1 = the mouse mode bind
-	// addr + 2 = the kbd mode bind
-	const unsigned char bind_macro_btn =  0x30;
-	const unsigned char bind_left_btn =   0x17;
-	const unsigned char bind_right_btn =  0x1c;
-	const unsigned char bind_scroll_btn = 0x21;
-	const unsigned char bind_scroll_up =  0x35;
-	const unsigned char bind_scroll_dwn = 0x3a;
-	const unsigned char bind_back_btn =   0x26;
-	const unsigned char bind_fwd_btn =    0x2b;
-
-	// the address the user chose
+	// the dest addr of the command
 	unsigned char addr;
-
-	// -- values --
-	const unsigned char led_off =    0x00;
-	const unsigned char led_on =     0x01;
-	const unsigned char led_pulse =  0x02;
-	const unsigned char led_battle = 0x03;
-
 	// stores user input values
 	unsigned char value = 0x00;
 
@@ -210,6 +176,12 @@ int main(int argc, char** argv) {
 			// clear kbd bind
 			send_command(addr + 2, 0x00);
 
+			value = resolve_bind(argv[4], 0);
+			if (value == 0) {
+				fprintf(stderr, "cannot bind '%s'\n", argv[4]);
+				exit(1);
+			}
+
 			addr++;
 		} else if (strcmp(argv[3], "kbd") == 0) {
 			// set the button to perform kbd functions
@@ -217,10 +189,15 @@ int main(int argc, char** argv) {
 			// clear mouse bind
 			send_command(addr + 1, 0x00);
 
+			value = resolve_bind(argv[4], 1);
+			if (value == 0) { 
+				fprintf(stderr, "cannot bind '%s'\n", argv[4]);
+				exit(1);
+			}
+
 			addr += 2;
 		} else usage();
 
-		sscanf(argv[4], "%hhu", &value);
 		send_command(addr, value);
 	} else {
 		usage();
