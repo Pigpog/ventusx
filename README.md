@@ -39,9 +39,9 @@ ventusx scroll brightness 255
 ventusx dpi 12
 
 # set polling rate to 1000:
-ventusx polling 1
+ventusx polling 1000
 # set polling rate to 125:
-ventusx polling 8
+ventusx polling 125
 
 # bind the "dpi" button to "a":
 ventusx bind dpi kbd a

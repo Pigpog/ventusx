@@ -155,7 +155,13 @@ int main(int argc, char** argv) {
 		send_command(x_dpi, value);
 		send_command(y_dpi, value);
 	} else if (strcmp(argv[1], "polling") == 0) {
-		sscanf(argv[2], "%hhu", &value);
+		value = resolve_polling_rate(argv[2]);
+		if (value == 255) {
+			fprintf(stderr, "invalid polling rate: %s\n", argv[2]);
+			cleanup();
+			exit(1);
+		}
+
 		send_command(polling_rate, value);
 	} else if (strcmp(argv[1], "bind") == 0) {
 		if (argc < 5) usage();
@@ -179,6 +185,7 @@ int main(int argc, char** argv) {
 			value = resolve_bind(argv[4], 0);
 			if (value == 0) {
 				fprintf(stderr, "cannot bind '%s'\n", argv[4]);
+				cleanup();
 				exit(1);
 			}
 
@@ -192,6 +199,7 @@ int main(int argc, char** argv) {
 			value = resolve_bind(argv[4], 1);
 			if (value == 0) { 
 				fprintf(stderr, "cannot bind '%s'\n", argv[4]);
+				cleanup();
 				exit(1);
 			}
 

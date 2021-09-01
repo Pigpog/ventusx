@@ -32,6 +32,8 @@ const unsigned char led_on =     0x01;
 const unsigned char led_pulse =  0x02;
 const unsigned char led_battle = 0x03;
 
+const char *polling_rates[] = { "", "1000", "", "500", "", "250", "", "125"};
+
 // keycodes for keyboard-mode bindings
 // the index of each item is it's keycode
 // blank entries are unknown or unused
@@ -74,14 +76,20 @@ const char *mouse_bind_map[] = { "", "left", "right", "", "scroll" };
 
 unsigned char resolve_bind(char *input, int mode) {
 	if (mode == 1){
-		for(int i = 0; i < 248; i++) {
-			if(strcmp(kbd_bind_map[i], input) == 0) return i;
+		for(int i = 0; i < sizeof(*kbd_bind_map); i++) {
+			if (strcmp(kbd_bind_map[i], input) == 0) return i;
 		}
 	} else {
-		for(int i = 0; i < 5; i++) {
-			if(strcmp(mouse_bind_map[i], input) == 0) return i;
+		for(int i = 0; i < sizeof(*mouse_bind_map); i++) {
+			if (strcmp(mouse_bind_map[i], input) == 0) return i;
 		}
 	}
 	return 0;
 }
 
+unsigned char resolve_polling_rate(char *input) {
+	for(int i = 0; i < sizeof(*polling_rates); i++) {
+		if (strcmp(polling_rates[i], input) == 0) return i;
+	}
+	return 255;
+}
