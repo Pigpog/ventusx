@@ -1,3 +1,14 @@
+#define HID_GET_REPORT                0x01
+#define HID_SET_REPORT                0x09
+#define HID_REPORT_TYPE_FEATURE       0x03
+
+const static uint16_t VENDOR_ID = 0x264a;
+const static uint16_t PRODUCT_ID = 0x1007;
+const static uint16_t PACKET_CTRL_LEN = 8;
+
+// not entirely sure what this is yet, but it makes it work
+unsigned char save[] = { 0xc4, 0x0f, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00};
+
 // -- addresses --
 // led control addresses
 const unsigned char led_palm =   0x13;

@@ -22,28 +22,18 @@
 #include <libusb-1.0/libusb.h>
 #include "data.c"
 
-#define HID_GET_REPORT                0x01
-#define HID_SET_REPORT                0x09
-#define HID_REPORT_TYPE_FEATURE       0x03
-
-const static uint16_t VENDOR_ID = 0x264a;
-const static uint16_t PRODUCT_ID = 0x1007;
-const static uint16_t PACKET_CTRL_LEN = 8;
-
 static char* basename;
-
-// not entirely sure what this is yet, but it makes it work
-unsigned char save[] = { 0xc4, 0x0f, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 static struct libusb_device_handle *devh = NULL;
 
-static void cleanup() {
+static void cleanup(int exit_code) {
 	if (devh != NULL) {
 		libusb_release_interface(devh, 0);
 		libusb_attach_kernel_driver(devh, 0);
 	}
 	libusb_close(devh);
 	libusb_exit(NULL);
+	exit(exit_code);
 }
 
 static int setup() {
@@ -90,9 +80,8 @@ static void usage() {
 	printf("    control an led: %s {palm|scroll} {on|off|battle|pulse|{brightness VALUE}}\n", basename);
 	printf("    set dpi: %s dpi VALUE\n", basename);
 	printf("    set polling rate: %s polling VALUE\n", basename);
-	printf("    rebind a buttion: %s bind BTTN {kbd|mouse} VALUE\n", basename);
-	cleanup();
-	exit(1);
+	printf("    rebind a button: %s bind BTTN {kbd|mouse} VALUE\n", basename);
+	cleanup(1);
 }
 
 static void send_command(const unsigned char address, const unsigned char value) {
@@ -106,15 +95,13 @@ static void send_command(const unsigned char address, const unsigned char value)
 	state = libusb_control_transfer(devh, 0x21, HID_SET_REPORT, 0x0300, 0, data, PACKET_CTRL_LEN, 5000);
 	if (state < 0) {
 		fprintf(stderr, "control out error %d\n", state);
-		cleanup();
-		exit(1);
+		cleanup(1);
 	}
 
 	state = libusb_control_transfer(devh, 0x21, HID_SET_REPORT, 0x0300, 0, save, PACKET_CTRL_LEN, 5000);
 	if (state < 0) {
 		fprintf(stderr, "control out error %d\n", state);
-		cleanup();
-		exit(1);
+		cleanup(1);
 	}
 }
 
@@ -129,8 +116,7 @@ int main(int argc, char** argv) {
 	if (argc < 3) usage();
 
 	if (setup() != 0) {
-		cleanup();
-		exit(1);
+		cleanup(1);
 	}
 
 	// cli arg handling
@@ -158,8 +144,7 @@ int main(int argc, char** argv) {
 		value = resolve_polling_rate(argv[2]);
 		if (value == 255) {
 			fprintf(stderr, "invalid polling rate: %s\n", argv[2]);
-			cleanup();
-			exit(1);
+			cleanup(1);
 		}
 
 		send_command(polling_rate, value);
@@ -185,8 +170,7 @@ int main(int argc, char** argv) {
 			value = resolve_bind(argv[4], 0);
 			if (value == 0) {
 				fprintf(stderr, "cannot bind '%s'\n", argv[4]);
-				cleanup();
-				exit(1);
+				cleanup(1);
 			}
 
 			addr++;
@@ -199,8 +183,7 @@ int main(int argc, char** argv) {
 			value = resolve_bind(argv[4], 1);
 			if (value == 0) { 
 				fprintf(stderr, "cannot bind '%s'\n", argv[4]);
-				cleanup();
-				exit(1);
+				cleanup(1);
 			}
 
 			addr += 2;
@@ -211,6 +194,6 @@ int main(int argc, char** argv) {
 		usage();
 	}
 
-	cleanup();
+	cleanup(0);
 	return 0;
 }
