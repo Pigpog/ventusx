@@ -80,6 +80,7 @@ static void usage() {
 	printf("    control an led: %s {palm|scroll} {on|off|battle|pulse|{brightness VALUE}}\n", basename);
 	printf("    set dpi: %s dpi VALUE\n", basename);
 	printf("    set polling rate: %s polling VALUE\n", basename);
+	printf("    set liftoff distance: %s liftoff VALUE\n", basename);
 	printf("    rebind a button: %s bind BTTN {kbd|mouse} VALUE\n", basename);
 	cleanup(1);
 }
@@ -148,6 +149,16 @@ int main(int argc, char** argv) {
 		}
 
 		send_command(polling_rate, value);
+	} else if (strcmp(argv[1], "liftoff") == 0) {
+		sscanf(argv[2], "%hhu", &value);
+		send_command(lift_off, value+128);
+
+		unsigned char data[] = { 0xc5, 0x00, 0x2e, value, 0x00, 0x00, 0x00, 0x00 };
+		int state = libusb_control_transfer(devh, 0x21, HID_SET_REPORT, 0x0300, 0, data, PACKET_CTRL_LEN, 5000);
+		if (state < 0) {
+			fprintf(stderr, "control out error %d\n", state);
+			cleanup(1);
+		}
 	} else if (strcmp(argv[1], "bind") == 0) {
 		if (argc < 5) usage();
 

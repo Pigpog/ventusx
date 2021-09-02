@@ -20,6 +20,7 @@ const unsigned char y_dpi = 0x05;
 
 // values: 0x01 = 1000Hz, 0x02 = 500Hz, 0x04 = 250Hz,  0x08 = 125Hz
 const unsigned char polling_rate = 0x00; 
+const unsigned char lift_off = 0x02;
 
 // bind control addresses
 // these addresses set whether the bind is
