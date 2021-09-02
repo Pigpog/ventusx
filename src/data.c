@@ -87,11 +87,11 @@ const char *mouse_bind_map[] = { "", "left", "right", "", "scroll" };
 
 unsigned char resolve_bind(char *input, int mode) {
 	if (mode == 1){
-		for(int i = 0; i < sizeof(*kbd_bind_map); i++) {
+		for(int i = 0; i < 248; i++) {
 			if (strcmp(kbd_bind_map[i], input) == 0) return i;
 		}
 	} else {
-		for(int i = 0; i < sizeof(*mouse_bind_map); i++) {
+		for(int i = 0; i < 5; i++) {
 			if (strcmp(mouse_bind_map[i], input) == 0) return i;
 		}
 	}
@@ -99,7 +99,7 @@ unsigned char resolve_bind(char *input, int mode) {
 }
 
 unsigned char resolve_polling_rate(char *input) {
-	for(int i = 0; i < sizeof(*polling_rates); i++) {
+	for(int i = 0; i < 8; i++) {
 		if (strcmp(polling_rates[i], input) == 0) return i;
 	}
 	return 255;
