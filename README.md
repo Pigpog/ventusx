@@ -43,6 +43,12 @@ ventusx polling 1000
 # set polling rate to 125:
 ventusx polling 125
 
+# set liftoff distance
+# only values between 7 and 15
+# are officially supported
+ventusx liftoff 7
+ventusx liftoff 15
+
 # bind the "dpi" button to "a":
 ventusx bind dpi kbd a
 # bind left click to right click:
