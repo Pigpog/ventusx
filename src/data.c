@@ -44,12 +44,12 @@ const unsigned char led_on =     0x01;
 const unsigned char led_pulse =  0x02;
 const unsigned char led_battle = 0x03;
 
-const char *polling_rates[] = { "", "1000", "", "500", "", "250", "", "125"};
+static const char *polling_rates[] = { "", "1000", "", "500", "", "250", "", "125"};
 
 // keycodes for keyboard-mode bindings
 // the index of each item is it's keycode
 // blank entries are unknown or unused
-const char *kbd_bind_map[] = 
+static const char *kbd_bind_map[] = 
 { "" , "" , "" , "" , "a", "b", "c", "d",
   "e", "f", "g", "h", "i", "j", "k", "l",
   "m", "n", "o", "p", "q", "r", "s", "t",
@@ -84,7 +84,7 @@ const char *kbd_bind_map[] =
   "XF86ScrollUp", "XF86ScrollDown", "", ""
 };
 
-const char *mouse_bind_map[] = { "", "left", "right", "", "scroll" };
+static const char *mouse_bind_map[] = { "", "left", "right", "", "scroll" };
 
 unsigned char resolve_bind(char *input, int mode) {
 	if (mode == 1){
